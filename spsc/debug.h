@@ -3,7 +3,7 @@
 
 #if defined(DEBUG) && DEBUG
 #define debug_print(fmt, ...) \
-    fprintf(stderr, fmt, __VA_ARGS__)
+    fprintf(stderr, fmt, ##__VA_ARGS__)
 #else
 #define debug_print(fmt, ...)
 #endif

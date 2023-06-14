@@ -1,5 +1,5 @@
 extern "C" {
-#include "vector.h"
+#include "../vector.h"
 }
 
 #include "gtest/gtest.h"
@@ -7,13 +7,7 @@ extern "C" {
 #include <vector>
 #include <algorithm>
 #include <numeric>
-
-#ifdef _WIN32
-#include <Windows.h>
-void sleep(int sec) { Sleep(sec * 1000); } // Make function sleep(), compatible with unix
-#else
 #include <unistd.h>
-#endif
 
 typedef struct
 {

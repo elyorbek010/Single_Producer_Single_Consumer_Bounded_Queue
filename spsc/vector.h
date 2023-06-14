@@ -3,6 +3,8 @@
 
 #define DEBUG 0
 
+#include "stddef.h"
+
 typedef struct vector_t vector_t;
 
 typedef enum vector_ret_t

@@ -70,8 +70,10 @@ vector_t* vector_create(size_t capacity)
 	}
 
 	vector->capacity = capacity;
-	vector->begin = vector->end = 0;
 
+	atomic_init(&vector->begin, 0);
+	atomic_init(&vector->end, 0);
+	
 	return vector;
 }
 
@@ -87,14 +89,14 @@ vector_ret_t vector_destroy(vector_t* vector)
 vector_ret_t vector_push(vector_t* vector, void* element)
 {
 	CHECK_AND_RETURN_IF_NOT_EXIST(vector);
-
+	
 	size_t begin = vector->begin;
 	size_t end = vector->end;
 
 	size_t next_end = vector_next_index(end, vector->capacity);
 
 	// Check if vector is FULL
-	if (next_end == begin)
+	if(next_end == begin)
 		return VECTOR_OVERFLOW;
 
 	vector->element[end] = element;
@@ -115,7 +117,7 @@ vector_ret_t vector_pop(vector_t* vector, void** p_element)
 	if (begin == end)
 		return VECTOR_UNDERFLOW;
 
-	*p_element = vector->element[begin];
+    *p_element = vector->element[begin];
 	vector->begin = vector_next_index(begin, vector->capacity);
 
 	return VECTOR_SUCCESS;
