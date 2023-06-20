@@ -31,7 +31,7 @@
 			debug_print("Object does not exist\n");   \
 			return VECTOR_FAILURE;                    \
 		}                                             \
-	} while (0);
+	} while (0)
 
 struct vector_t
 {
@@ -54,7 +54,6 @@ vector_ret_t vector_push(vector_t *vector, void *element);
 vector_ret_t vector_pop(vector_t *vector, void **element);
 
 static inline size_t vector_next_index(const size_t index, const size_t capacity);
-static inline size_t vector_prev_index(const size_t index, const size_t capacity);
 
 /*
  * FUNCTION DEFINITIONS
@@ -130,10 +129,4 @@ static inline size_t vector_next_index(const size_t index, const size_t capacity
 {
 	// note: actual allocated capacity is 'capacity + 1'
 	return (index + 1) % (capacity + 1);
-}
-
-static inline size_t vector_prev_index(const size_t index, const size_t capacity)
-{
-	// note: actual allocated capacity is 'capacity + 1'
-	return index == 0 ? capacity : index - 1;
 }
