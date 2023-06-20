@@ -48,7 +48,7 @@ void spsc_simulate(size_t vector_size, size_t data_amount)
   vector_destroy(vector);
 }
 
-static void Spsc_Bench_spsc_simulate(benchmark::State &state)
+static void Bench_spsc_simulate(benchmark::State &state)
 {
   for (auto _ : state)
   {
@@ -56,6 +56,6 @@ static void Spsc_Bench_spsc_simulate(benchmark::State &state)
   }
 }
 
-BENCHMARK(Spsc_Bench_spsc_simulate)->RangeMultiplier(2)->Range(1, 1 << 20);
+BENCHMARK(Bench_spsc_simulate)->RangeMultiplier(2)->Range(1, 1 << 20);
 
 BENCHMARK_MAIN();
