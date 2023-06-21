@@ -36,18 +36,28 @@ void spsc_simulate(size_t vector_size, size_t data_amount)
                                   ret = vector_push(vector, (void *)iter);
 
                                   if (ret == VECTOR_FAILURE)
+                                  {
                                     abort();
+                                  }
                                   else if (ret == VECTOR_SUCCESS)
                                   {
 #if LOG_ENABLED == 1
-                                    producer_logs << "PUSHED " << iter << " " << std::chrono::system_clock::now().time_since_epoch() / std::chrono::nanoseconds(1) << "\n";
+                                    producer_logs << "PUSHED "
+                                                  << iter
+                                                  << " "
+                                                  << std::chrono::system_clock::now().time_since_epoch() /
+                                                         std::chrono::nanoseconds(1)
+                                                  << "\n";
 #endif
                                     iter++;
                                   }
                                   else if (ret == VECTOR_OVERFLOW)
                                   {
 #if LOG_ENABLED == 1
-                                    producer_logs << "OVERFLOW " << std::chrono::system_clock::now().time_since_epoch() / std::chrono::nanoseconds(1) << "\n";
+                                    producer_logs << "OVERFLOW "
+                                                  << std::chrono::system_clock::now().time_since_epoch() /
+                                                         std::chrono::nanoseconds(1)
+                                                  << "\n";
 #endif
                                     // continue loop, try to push data
                                   }
@@ -74,11 +84,18 @@ void spsc_simulate(size_t vector_size, size_t data_amount)
                                   ret = vector_pop(vector, &data_ptr);
 
                                   if (ret == VECTOR_FAILURE)
+                                  {
                                     abort();
+                                  }
                                   else if (ret == VECTOR_SUCCESS)
                                   {
 #if LOG_ENABLED == 1
-                                    consumer_logs << "POPPED " << (size_t)data_ptr << std::chrono::system_clock::now().time_since_epoch() / std::chrono::nanoseconds(1) << "\n";
+                                    consumer_logs << "POPPED "
+                                                  << (size_t)data_ptr
+                                                  << " "
+                                                  << std::chrono::system_clock::now().time_since_epoch() /
+                                                         std::chrono::nanoseconds(1)
+                                                  << "\n";
 #endif
                                     iter++;
                                   }
