@@ -90,14 +90,18 @@ vector_ret_t vector_push(vector_t *vector, void *element)
 {
 	CHECK_AND_RETURN_IF_NOT_EXIST(vector);
 
-	size_t begin = atomic_load_explicit(&vector->begin, memory_order_acquire);
-	size_t end = atomic_load_explicit(&vector->end, memory_order_acquire);
+	size_t begin = atomic_load_explicit(&vector->begin, memory_order_consume);
+	size_t end = atomic_load_explicit(&vector->end, memory_order_relaxed);
 
 	size_t next_end = vector_next_index(end, vector->capacity);
 
 	// Check if vector is FULL
 	if (next_end == begin)
 		return VECTOR_OVERFLOW;
+
+	void * dest = vector->element + end;
+
+	
 
 	vector->element[end] = element;
 	atomic_store_explicit(&vector->end, next_end, memory_order_release);
@@ -110,8 +114,8 @@ vector_ret_t vector_pop(vector_t *vector, void **p_element)
 	CHECK_AND_RETURN_IF_NOT_EXIST(vector);
 	CHECK_AND_RETURN_IF_NOT_EXIST(p_element);
 
-	size_t begin = atomic_load_explicit(&vector->begin, memory_order_acquire);
-	size_t end = atomic_load_explicit(&vector->end, memory_order_acquire);
+	size_t begin = atomic_load_explicit(&vector->begin, memory_order_relaxed);
+	size_t end = atomic_load_explicit(&vector->end, memory_order_consume);
 
 	// Check if vector is EMPTY
 	if (begin == end)
