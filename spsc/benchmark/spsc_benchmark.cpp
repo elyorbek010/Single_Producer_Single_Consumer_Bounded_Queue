@@ -12,12 +12,15 @@ extern "C"
 
 #define LOG_ENABLED 0
 
+pthread_barrier_t thread_ready;
+
 void spsc_simulate(size_t vector_size, size_t data_amount)
 {
   vector_t *vector = vector_create(vector_size);
 
   auto producer = std::thread([=]()
                               {
+                                pthread_barrier_wait(&thread_ready);
                                 vector_ret_t ret = VECTOR_SUCCESS;
                                 size_t iter = 0;
 #if LOG_ENABLED == 1
@@ -70,6 +73,7 @@ void spsc_simulate(size_t vector_size, size_t data_amount)
 
   auto consumer = std::thread([=]()
                               {
+                                pthread_barrier_wait(&thread_ready);
                                 vector_ret_t ret = VECTOR_SUCCESS;
                                 void *data_ptr = nullptr;
                                 size_t iter = 0;
@@ -121,6 +125,8 @@ void spsc_simulate(size_t vector_size, size_t data_amount)
 
 static void Bench_spsc_simulate(benchmark::State &state)
 {
+  pthread_barrier_init(&thread_ready, NULL, 2);
+  
   for (auto _ : state)
   {
     spsc_simulate(1000, state.range(0));
