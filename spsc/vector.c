@@ -36,8 +36,8 @@
 struct vector_t
 {
 	size_t capacity;
-	atomic_size_t begin; // begin index is inclusive
-	atomic_size_t end;	 // end index is exclusive
+	size_t begin; // begin index is inclusive
+	size_t end;  // end index is exclusive
 
 	void *element[];
 };
@@ -69,10 +69,8 @@ vector_t *vector_create(size_t capacity)
 		return NULL;
 	}
 
+	vector->begin = vector->end = 0;
 	vector->capacity = capacity;
-
-	atomic_init(&vector->begin, 0);
-	atomic_init(&vector->end, 0);
 
 	return vector;
 }
@@ -90,8 +88,9 @@ vector_ret_t vector_push(vector_t *vector, void *element)
 {
 	CHECK_AND_RETURN_IF_NOT_EXIST(vector);
 
-	size_t begin = atomic_load_explicit(&vector->begin, memory_order_consume);
-	size_t end = atomic_load_explicit(&vector->end, memory_order_relaxed);
+	atomic_thread_fence(memory_order_acquire);
+	size_t begin = vector->begin;
+	size_t end = vector->end;
 
 	size_t next_end = vector_next_index(end, vector->capacity);
 
@@ -99,12 +98,11 @@ vector_ret_t vector_push(vector_t *vector, void *element)
 	if (next_end == begin)
 		return VECTOR_OVERFLOW;
 
-	void * dest = vector->element + end;
-
-	
+	void *dest = vector->element + end;
 
 	vector->element[end] = element;
-	atomic_store_explicit(&vector->end, next_end, memory_order_release);
+	vector->end = next_end;
+	atomic_thread_fence(memory_order_release);
 
 	return VECTOR_SUCCESS;
 }
@@ -114,17 +112,17 @@ vector_ret_t vector_pop(vector_t *vector, void **p_element)
 	CHECK_AND_RETURN_IF_NOT_EXIST(vector);
 	CHECK_AND_RETURN_IF_NOT_EXIST(p_element);
 
-	size_t begin = atomic_load_explicit(&vector->begin, memory_order_relaxed);
-	size_t end = atomic_load_explicit(&vector->end, memory_order_consume);
+	atomic_thread_fence(memory_order_acquire);
+	size_t begin = vector->begin;
+	size_t end = vector->end;
 
 	// Check if vector is EMPTY
 	if (begin == end)
 		return VECTOR_UNDERFLOW;
 
 	*p_element = vector->element[begin];
-	atomic_store_explicit(&vector->begin,
-						  vector_next_index(begin, vector->capacity),
-						  memory_order_release);
+	vector->begin = vector_next_index(begin, vector->capacity);
+	atomic_thread_fence(memory_order_release);
 
 	return VECTOR_SUCCESS;
 }
